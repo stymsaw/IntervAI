@@ -26,7 +26,8 @@ android {
         
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        val groqApiKey = localProperties.getProperty("GROQ_API_KEY") ?: ""
+        val rawGroqApiKey = localProperties.getProperty("GROQ_API_KEY") ?: ""
+        val groqApiKey = rawGroqApiKey.trim().removeSurrounding("\"")
         buildConfigField("String", "GROQ_API_KEY", "\"$groqApiKey\"")
     }
     
