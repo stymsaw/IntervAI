@@ -8,7 +8,7 @@ data class ChatMessage(
 )
 
 data class GroqChatRequest(
-    @SerializedName("model") val model: String = "llama-3.1-8b-instant",
+    @SerializedName("model") val model: String = "openai/gpt-oss-20b",
     @SerializedName("messages") val messages: List<ChatMessage>,
     @SerializedName("temperature") val temperature: Double = 0.7,
     @SerializedName("max_tokens") val maxTokens: Int = 300
