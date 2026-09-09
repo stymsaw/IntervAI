@@ -33,6 +33,7 @@ class InterviewViewModel(application: Application) : AndroidViewModel(applicatio
 
     val ttsManager = TtsManager(application)
     val sttManager = SttManager(application)
+    val historyManager = com.stym.intervai.data.local.InterviewHistoryManager(application)
     private val apiService = GroqApiService.create()
 
     private val _uiState = MutableStateFlow<InterviewState>(InterviewState.Idle)
@@ -160,6 +161,7 @@ class InterviewViewModel(application: Application) : AndroidViewModel(applicatio
 
             result.onSuccess { response ->
                 val evalReport = response.choices.firstOrNull()?.message?.content ?: "Unable to generate evaluation."
+                historyManager.saveReport(selectedTopic.displayName, evalReport)
                 _uiState.value = InterviewState.Finished(evalReport)
             }.onFailure { exception ->
                 _uiState.value = InterviewState.Error("Evaluation failed: ${exception.localizedMessage}")

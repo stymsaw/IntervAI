@@ -39,9 +39,14 @@ fun AppNavGraph(
         ) {
             composable(Screen.TopicSelection.route) {
                 TopicSelectionScreen(
+                    viewModel = viewModel,
                     onTopicSelected = { topic ->
                         viewModel.startInterview(topic)
                         navController.navigate(Screen.LiveInterview.route)
+                    },
+                    onReportSelected = { reportText ->
+                        lastReport = reportText
+                        navController.navigate(Screen.EvaluationReport.route)
                     }
                 )
             }
