@@ -22,6 +22,8 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
 
     var onSpeechCompleted: (() -> Unit)? = null
 
+    private var pendingSpeakText: String? = null
+
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
             val result = tts?.setLanguage(Locale.US)
@@ -31,6 +33,10 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
                 _isInitialized.value = true
                 setupUtteranceListener()
                 Log.d(tag, "TTS Engine Initialized successfully")
+                pendingSpeakText?.let { text ->
+                    pendingSpeakText = null
+                    speak(text)
+                }
             }
         } else {
             com.stym.intervai.data.AppLogger.logError(tag, "TTS Initialization failed with status: $status")
@@ -63,7 +69,8 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
 
     fun speak(text: String, utteranceId: String = "INTERVAI_TTS_ID") {
         if (!_isInitialized.value) {
-            Log.w(tag, "TTS not initialized yet")
+            Log.w(tag, "TTS not initialized yet. Queuing speech.")
+            pendingSpeakText = text
             return
         }
         stop()

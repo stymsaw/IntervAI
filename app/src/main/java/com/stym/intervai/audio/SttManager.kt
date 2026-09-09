@@ -98,7 +98,7 @@ class SttManager(private val context: Context) : RecognitionListener {
     override fun onError(error: Int) {
         val errorMessage = when (error) {
             SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
-            SpeechRecognizer.ERROR_CLIENT -> "Client side error"
+            SpeechRecognizer.ERROR_CLIENT -> "Client side speech recognizer idle"
             SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Insufficient permissions"
             SpeechRecognizer.ERROR_NETWORK -> "Network error"
             SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout"
@@ -108,7 +108,14 @@ class SttManager(private val context: Context) : RecognitionListener {
             SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "No speech input"
             else -> "Unknown error ($error)"
         }
-        com.stym.intervai.data.AppLogger.logError(tag, "STT Error: $errorMessage")
+
+        // Only log critical audio/permission/network errors to AppLogger so client cancels don't trigger global error dialogs
+        if (error != SpeechRecognizer.ERROR_CLIENT && error != SpeechRecognizer.ERROR_NO_MATCH && error != SpeechRecognizer.ERROR_SPEECH_TIMEOUT) {
+            com.stym.intervai.data.AppLogger.logError(tag, "STT Error: $errorMessage")
+        } else {
+            Log.w(tag, "STT Non-fatal warning ($error): $errorMessage")
+        }
+
         _state.value = SttState.Error(errorMessage)
     }
 

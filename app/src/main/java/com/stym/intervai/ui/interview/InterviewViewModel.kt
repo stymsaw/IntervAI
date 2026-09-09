@@ -127,8 +127,9 @@ class InterviewViewModel(application: Application) : AndroidViewModel(applicatio
                         }
                     }
                     is SttState.FinalResult -> {
-                        if (_uiState.value is InterviewState.CandidateAnswering) {
+                        if (_uiState.value is InterviewState.CandidateAnswering && state.text.isNotBlank()) {
                             _uiState.value = InterviewState.CandidateAnswering(state.text)
+                            stopListeningAndSubmitAnswer(state.text)
                         }
                     }
                     is SttState.Error -> {
