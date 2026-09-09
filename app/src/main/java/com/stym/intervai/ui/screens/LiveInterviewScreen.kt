@@ -195,6 +195,16 @@ fun LiveInterviewScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                if (isTtsSpeaking) {
+                    OutlinedButton(
+                        onClick = { viewModel.stopTtsSpeaking() },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("🔇 Stop AI Speaking")
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
                 // Audio Wave Pulse Indicator
                 val scale by animateFloatAsState(
                     targetValue = if (uiState is InterviewState.CandidateAnswering) 1f + (rmsDb / 10f).coerceIn(0f, 0.5f) else 1f,
@@ -213,7 +223,10 @@ fun LiveInterviewScreen(
                 ) {
                     Button(
                         onClick = {
-                            if (uiState is InterviewState.CandidateAnswering) {
+                            if (isTtsSpeaking) {
+                                viewModel.stopTtsSpeaking()
+                                viewModel.startListeningForAnswer()
+                            } else if (uiState is InterviewState.CandidateAnswering) {
                                 viewModel.stopListeningAndSubmitAnswer()
                             } else {
                                 viewModel.startListeningForAnswer()
@@ -226,7 +239,7 @@ fun LiveInterviewScreen(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         Text(
-                            text = if (uiState is InterviewState.CandidateAnswering) "🎙️ LISTENING" else "🎙️ SPEAK",
+                            text = if (isTtsSpeaking) "⏸ INTERRUPT" else if (uiState is InterviewState.CandidateAnswering) "🎙️ LISTENING" else "🎙️ SPEAK",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White

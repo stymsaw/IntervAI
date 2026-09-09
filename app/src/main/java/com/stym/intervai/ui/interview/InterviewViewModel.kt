@@ -87,6 +87,10 @@ class InterviewViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun stopTtsSpeaking() {
+        ttsManager.stop()
+    }
+
     fun startListeningForAnswer() {
         ttsManager.stop()
         _uiState.value = InterviewState.CandidateAnswering("")
