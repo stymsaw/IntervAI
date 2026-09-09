@@ -64,7 +64,7 @@ class InterviewViewModel(application: Application) : AndroidViewModel(applicatio
                 tag = tag,
                 actionMessage = "Failed to fetch AI Question from Groq API"
             ) {
-                val request = GroqChatRequest(messages = conversationHistory.toList())
+                val request = GroqChatRequest(messages = conversationHistory.toList(), maxTokens = 120)
                 apiService.getChatCompletion(request = request)
             }
 
