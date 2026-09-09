@@ -1,0 +1,47 @@
+PROJECT OVERVIEW
+================
+Project Name: IntervAI (or PrepFlow)
+
+What You Are Building:
+IntervAI is a real-time, voice-interactive Android application designed to conduct simulated technical and behavioral mock interviews. Powered by Android's native speech engines and Groq's low-latency LLM infrastructure (Llama 3), the app asks domain-specific technical questions aloud, listens to candidate spoken responses, conducts dynamic follow-ups, and produces a final detailed evaluation report.
+
+Why You Are Building It:
+1. Seamless Voice Interaction: Eliminates manual typing, forcing candidates to articulate technical concepts verbally just like in real technical interviews.
+2. Zero-Latency Conversation: Leverages Groq's sub-500ms response speeds to eliminate awkward silences, creating a realistic interview pace.
+3. Completely Free Stack: Built entirely on free tools and APIs (Android Native STT/TTS, Groq API free tier, and Google Gemini API free tier) to keep infrastructure costs at zero.
+4. Comprehensive Assessment: Provides structured feedback at the end of every session, allowing candidates to identify weak spots, practice answer structure, and gain confidence offline/on-the-go.
+
+
+PHASED ACTION PLAN
+==================
+
+PHASE 1: Foundation & Credentials Setup
+--------------------------------------
+- Project Initialization: Create a new Jetpack Compose project in Android Studio.
+- Manifest Permissions: Add RECORD_AUDIO and INTERNET permissions.
+- API Key Registration: Set up a free account at console.groq.com and generate an API key.
+- Network Dependencies: Add Retrofit and Gson dependencies in build.gradle.kts to interface with Groq's Chat Completion endpoint (/openai/v1/chat/completions).
+
+PHASE 2: Local Hardware Integration (Voice Engine)
+--------------------------------------------------
+- Text-To-Speech (TTS) Handler: Wrap Android's native TextToSpeech engine to convert Groq's written questions into spoken audio.
+- Speech-To-Text (STT) Handler: Wrap Android's native SpeechRecognizer to capture mic input and convert candidate speech into text.
+- Runtime Permissions: Build runtime permission prompts for microphone access before initiating an interview.
+
+PHASE 3: State Management & System Prompting
+--------------------------------------------
+- Groq API Client: Implement Retrofit models and service calling fast models (e.g., llama-3.3-70b-versatile or llama-3.1-8b-instant).
+- System Prompt Design: Define strict interviewer personas (e.g., "Act as a technical interviewer. Ask ONE concise question at a time under 3 sentences").
+- ViewModel State Machine: Build a state machine managing interview conversation history (System, Assistant, User) and coordinating the sequence: User Speaks (STT) -> Send to Groq -> Read Answer (TTS).
+
+PHASE 4: User Interface (Jetpack Compose)
+-----------------------------------------
+- Screen 1 (Topic Selection): Allow users to select role/domain (e.g., Android Architecture, DSA) and session length.
+- Screen 2 (Live Interview): Display current AI question, real-time speech transcript, audio waveform/indicator, and manual mic control button.
+- Screen 3 (Post-Interview Review): End screen sending the complete conversation log to Gemini/Groq for evaluation (scoring, strengths, improvements).
+
+PHASE 5: Refinement & Testing
+-----------------------------
+- Interruption Handling: Instantly stop TTS audio playback if the user begins speaking or taps record early.
+- Error & Edge Cases: Add fallbacks for low-confidence speech transcriptions, network errors, or API rate limits.
+- Resource Cleanup: Ensure STT and TTS engines release resources cleanly when the app or activity stops.
