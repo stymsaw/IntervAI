@@ -13,14 +13,14 @@ import retrofit2.http.POST
 
 interface GroqApiService {
 
-    @POST("openai/v1/chat/completions")
+    @POST("chat/completions")
     suspend fun getChatCompletion(
         @Header("Authorization") authorization: String = "Bearer ${BuildConfig.GROQ_API_KEY}",
         @Body request: GroqChatRequest
     ): GroqChatResponse
 
     companion object {
-        private const val BASE_URL = "https://api.groq.com/"
+        private const val BASE_URL = "https://api.groq.com/openai/v1/"
 
         fun create(): GroqApiService {
             val loggingInterceptor = HttpLoggingInterceptor().apply {
