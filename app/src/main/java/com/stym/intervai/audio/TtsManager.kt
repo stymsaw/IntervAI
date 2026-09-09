@@ -26,14 +26,14 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
         if (status == TextToSpeech.SUCCESS) {
             val result = tts?.setLanguage(Locale.US)
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e(tag, "TTS Language US is not supported or missing data")
+                com.stym.intervai.data.AppLogger.logError(tag, "TTS Language US is not supported or missing data")
             } else {
                 _isInitialized.value = true
                 setupUtteranceListener()
                 Log.d(tag, "TTS Engine Initialized successfully")
             }
         } else {
-            Log.e(tag, "TTS Initialization failed with status: $status")
+            com.stym.intervai.data.AppLogger.logError(tag, "TTS Initialization failed with status: $status")
         }
     }
 
@@ -51,12 +51,12 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
             @Deprecated("Deprecated in Java")
             override fun onError(utteranceId: String?) {
                 _isSpeaking.value = false
-                Log.e(tag, "TTS Utterance Error: $utteranceId")
+                com.stym.intervai.data.AppLogger.logError(tag, "TTS Utterance Error: $utteranceId")
             }
 
             override fun onError(utteranceId: String?, errorCode: Int) {
                 _isSpeaking.value = false
-                Log.e(tag, "TTS Utterance Error code $errorCode for: $utteranceId")
+                com.stym.intervai.data.AppLogger.logError(tag, "TTS Utterance Error code $errorCode for: $utteranceId")
             }
         })
     }

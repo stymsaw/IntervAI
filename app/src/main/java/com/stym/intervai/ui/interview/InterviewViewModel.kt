@@ -58,20 +58,23 @@ class InterviewViewModel(application: Application) : AndroidViewModel(applicatio
 
     private fun fetchNextAIQuestion() {
         viewModelScope.launch {
-            try {
-                _uiState.value = InterviewState.AIQuestioning("Thinking of next question...")
+            _uiState.value = InterviewState.AIQuestioning("Thinking of next question...")
+            
+            val result = com.stym.intervai.data.AppLogger.runCatchingCentralized(
+                tag = tag,
+                actionMessage = "Failed to fetch AI Question from Groq API"
+            ) {
                 val request = GroqChatRequest(messages = conversationHistory.toList())
-                val response = apiService.getChatCompletion(request = request)
-                val aiReply = response.choices.firstOrNull()?.message?.content ?: "Could you please elaborate on your experience?"
+                apiService.getChatCompletion(request = request)
+            }
 
+            result.onSuccess { response ->
+                val aiReply = response.choices.firstOrNull()?.message?.content ?: "Could you please elaborate on your experience?"
                 conversationHistory.add(ChatMessage("assistant", aiReply))
                 _uiState.value = InterviewState.AIQuestioning(aiReply)
-                
-                // Speak out the AI question using TTS
                 ttsManager.speak(aiReply)
-            } catch (e: Exception) {
-                Log.e(tag, "Error fetching Groq response", e)
-                _uiState.value = InterviewState.Error(e.localizedMessage ?: "Failed to connect to Groq AI")
+            }.onFailure { exception ->
+                _uiState.value = InterviewState.Error(exception.localizedMessage ?: "Failed to connect to Groq AI")
             }
         }
     }
@@ -142,19 +145,24 @@ class InterviewViewModel(application: Application) : AndroidViewModel(applicatio
         
         viewModelScope.launch {
             _uiState.value = InterviewState.Evaluating
-            try {
+            
+            val result = com.stym.intervai.data.AppLogger.runCatchingCentralized(
+                tag = tag,
+                actionMessage = "Failed to generate evaluation report from Groq API"
+            ) {
                 val evalPrompt = ChatMessage(
                     "system",
                     "The interview session has concluded. Evaluate the candidate's answers based on the conversation history. Provide a structured review with: 1) Overall Score (1-10), 2) Key Strengths, 3) Areas for Improvement, and 4) Actionable Recommendations."
                 )
                 val evalHistory = conversationHistory + evalPrompt
-                val response = apiService.getChatCompletion(request = GroqChatRequest(messages = evalHistory, maxTokens = 600))
+                apiService.getChatCompletion(request = GroqChatRequest(messages = evalHistory, maxTokens = 600))
+            }
+
+            result.onSuccess { response ->
                 val evalReport = response.choices.firstOrNull()?.message?.content ?: "Unable to generate evaluation."
-                
                 _uiState.value = InterviewState.Finished(evalReport)
-            } catch (e: Exception) {
-                Log.e(tag, "Error generating evaluation", e)
-                _uiState.value = InterviewState.Error("Evaluation failed: ${e.localizedMessage}")
+            }.onFailure { exception ->
+                _uiState.value = InterviewState.Error("Evaluation failed: ${exception.localizedMessage}")
             }
         }
     }

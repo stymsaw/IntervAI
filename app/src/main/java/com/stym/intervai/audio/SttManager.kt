@@ -41,7 +41,7 @@ class SttManager(private val context: Context) : RecognitionListener {
                 setRecognitionListener(this@SttManager)
             }
         } else {
-            Log.e(tag, "Speech Recognition not available on this device")
+            com.stym.intervai.data.AppLogger.logError(tag, "Speech Recognition not available on this device")
             _state.value = SttState.Error("Speech Recognition unavailable")
         }
     }
@@ -108,7 +108,7 @@ class SttManager(private val context: Context) : RecognitionListener {
             SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "No speech input"
             else -> "Unknown error ($error)"
         }
-        Log.e(tag, "STT Error: $errorMessage")
+        com.stym.intervai.data.AppLogger.logError(tag, "STT Error: $errorMessage")
         _state.value = SttState.Error(errorMessage)
     }
 
